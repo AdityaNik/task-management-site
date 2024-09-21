@@ -10,7 +10,7 @@ export default function Home() {
   const user = useRecoilValue(userState);
 
   return (
-    <div className="flex mt-32 items-center justify-center">
+    <div className="flex lg:mt-32 items-center justify-center">
       {user.isLoading ? (
         <Card className="w-[350px]">
           <CardContent>
@@ -33,7 +33,7 @@ export default function Home() {
           </CardContent>
         </Card>
       ) : (
-        <div>
+        <div className="m-4">
           <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
             Manage yout tasks in easy and effective way....
           </h1>

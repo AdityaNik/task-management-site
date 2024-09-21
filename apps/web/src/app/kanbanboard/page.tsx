@@ -113,18 +113,18 @@ export default function KanbanBoard() {
     return <div>loading! Need to login....</div>;
   } else {
     return (
-      <div className="flex justify-center mt-14 gap-14 m-14">
+      <div className="flex justify-center lg:flex-row flex-col mt-14 gap-14 lg:m-14 m-4">
         {["To Do", "In Progress", "Completed"].map((status) => (
           <Card
             key={status}
             className={`${
               status === "Completed"
-                ? "border-green-500 w-1/3"
+                ? "border-green-500 lg:w-1/3"
                 : status === "In Progress"
-                  ? "border-yellow-500 w-1/3"
+                  ? "border-yellow-500 lg:w-1/3"
                   : status === "To Do"
-                    ? "border-red-500 w-1/3"
-                    : "w-1/3"
+                    ? "border-red-500 lg:w-1/3"
+                    : "lg:w-1/3"
             }`}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, status as Task["status"])}

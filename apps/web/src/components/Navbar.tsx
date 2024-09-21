@@ -12,19 +12,20 @@ const Navbar = () => {
   const user = useRecoilValue(userState);
 
   return (
-    <div className="flex justify-between p-4 py-6 border-b shadow-md">
-      <div className="flex lg:ml-10 gap-4">
-        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0">
+    <div className="flex flex-col lg:flex-row md:flex-row justify-between p-4 py-6 border-b shadow-md">
+      {/* Left section */}
+      <div className="flex flex-col lg:flex-row gap-4 lg:ml-10">
+        <h2 className="scroll-m-20 text-2xl sm:text-3xl font-semibold tracking-tight first:mt-0">
           Task Management
         </h2>
-        <div className="ml-6">
+        <div className="flex gap-4 mt-2 lg:mt-0">
           <Button
             variant={"ghost"}
             onClick={() => {
               router.push("/tasklist");
             }}
           >
-            <h4 className="scroll-m-20 border-b text-xl font-semibold tracking-tight">
+            <h4 className="scroll-m-20 border-b text-lg sm:text-xl font-semibold tracking-tight">
               Task List
             </h4>
           </Button>
@@ -34,26 +35,28 @@ const Navbar = () => {
               router.push("/kanbanboard");
             }}
           >
-            <h4 className="scroll-m-20 border-b text-xl font-semibold tracking-tight">
+            <h4 className="scroll-m-20 border-b text-lg sm:text-xl font-semibold tracking-tight">
               Kanban Board
             </h4>
           </Button>
         </div>
       </div>
-      <div className="flex gap-6 mr-10">
-        <ModeToggle></ModeToggle>
+
+      {/* Right section */}
+      <div className="flex items-center gap-4 lg:gap-6 mt-4 lg:mt-0 lg:mr-10">
+        <ModeToggle />
         {!user.isLoading ? (
-          <>
+          <div className="flex items-center gap-2 sm:gap-4">
             <Avatar>
               <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <p className="leading-7 [&:not(:first-child)]">
-              hello! {user.username}
+            <p className="hidden sm:block text-sm sm:text-base">
+              Hello! {user.username}
             </p>
-          </>
+          </div>
         ) : (
-          <div>need to login/register</div>
+          <div className="text-sm">Need to login/register</div>
         )}
       </div>
     </div>

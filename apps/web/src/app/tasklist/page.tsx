@@ -222,16 +222,16 @@ export default function TaskList() {
   } else {
     return (
       <div>
-        <Card className="m-8 lg:m-16">
+        <Card className="m-4 lg:m-16 md:m-16">
           <CardHeader>
             <CardTitle>
-              <div className="flex justify-between mb-4">
+              <div className="flex flex-col md:flex-row lg:flex-row justify-between mb-4">
                 <div>
                   <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0">
                     Task List
                   </h2>
                 </div>
-                <div className="flex gap-8">
+                <div className="flex flex-col md:flex-row lg:flex-row gap-8 mt-4 lg:mt-0 md:mt-0">
                   <Select
                     onValueChange={(value) => {
                       applyFilter(value);
@@ -369,7 +369,7 @@ export default function TaskList() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-flow-row grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-8 mx-6">
+            <div className="grid grid-flow-row grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-8 lg:mx-8 md:mx-8">
               {tasks.map((task) => (
                 <Card
                   key={task._id as unknown as React.Key}
@@ -384,20 +384,14 @@ export default function TaskList() {
                   }`}
                 >
                   <CardContent>
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-4 py-6">
                       {/* Title */}
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label
-                          htmlFor={`title-${task._id}`}
-                          className="text-right"
-                        >
-                          Title
-                        </Label>
+                      <div className="grid w-full items-center gap-1.5">
+                        <Label htmlFor={`title-${task._id}`}>Title</Label>
                         <Input
                           id={`title-${task._id}`}
                           value={task.title}
                           disabled={!task.isEditing}
-                          className="col-span-3"
                           onChange={(e) => {
                             task.title = e.target.value;
                             setTasks([...tasks]);
@@ -406,18 +400,14 @@ export default function TaskList() {
                       </div>
 
                       {/* Description (Multiline) */}
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label
-                          htmlFor={`description-${task._id}`}
-                          className="text-right"
-                        >
+                      <div className="grid w-full items-center gap-1.5">
+                        <Label htmlFor={`description-${task._id}`}>
                           Description
                         </Label>
                         <Textarea
                           id={`description-${task._id}`}
                           value={task.description}
                           disabled={!task.isEditing}
-                          className="col-span-3"
                           onChange={(e) => {
                             task.description = e.target.value;
                             setTasks([...tasks]);
@@ -426,13 +416,8 @@ export default function TaskList() {
                       </div>
 
                       {/* Status */}
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label
-                          htmlFor={`status-${task._id}`}
-                          className="text-right"
-                        >
-                          Status
-                        </Label>
+                      <div className="grid w-full items-center gap-1.5">
+                        <Label htmlFor={`status-${task._id}`}>Status</Label>
                         <Select
                           disabled={!task.isEditing}
                           value={task.status}
@@ -441,7 +426,7 @@ export default function TaskList() {
                             setTasks([...tasks]);
                           }}
                         >
-                          <SelectTrigger className="col-span-3">
+                          <SelectTrigger>
                             <SelectValue placeholder="Select Status" />
                           </SelectTrigger>
                           <SelectContent>
@@ -455,13 +440,8 @@ export default function TaskList() {
                       </div>
 
                       {/* Priority */}
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label
-                          htmlFor={`priority-${task._id}`}
-                          className="text-right"
-                        >
-                          Priority
-                        </Label>
+                      <div className="grid w-full items-center gap-1.5">
+                        <Label htmlFor={`priority-${task._id}`}>Priority</Label>
                         <Select
                           disabled={!task.isEditing}
                           value={task.priority.toString()}
@@ -470,7 +450,7 @@ export default function TaskList() {
                             setTasks([...tasks]);
                           }}
                         >
-                          <SelectTrigger className="col-span-3">
+                          <SelectTrigger>
                             <SelectValue placeholder="Select Priority" />
                           </SelectTrigger>
                           <SelectContent>
@@ -488,13 +468,8 @@ export default function TaskList() {
                       </div>
 
                       {/* Due Date (Date Picker) */}
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label
-                          htmlFor={`dueDate-${task._id}`}
-                          className="text-right"
-                        >
-                          Due Date
-                        </Label>
+                      <div className="grid w-full items-center gap-1.5">
+                        <Label htmlFor={`dueDate-${task._id}`}>Due Date</Label>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
@@ -522,7 +497,7 @@ export default function TaskList() {
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="flex justify-between">
+                  <CardFooter className="flex justify-between gap-4">
                     {task.isEditing ? (
                       <Button onClick={() => handleSave(task._id)}>Save</Button>
                     ) : (
