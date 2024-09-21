@@ -8,13 +8,11 @@ import { Task } from "../store/atoms/task";
 import { BASE_URL } from "../config";
 import { useRecoilValue } from "recoil";
 import { userState } from "../store/atoms/user";
-import { useRouter } from "next/navigation";
 
 export default function KanbanBoard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hydrated, setHydrated] = useState<boolean>(false);
   const user = useRecoilValue(userState);
-  const router = useRouter();
 
   const getTasks = async () => {
     const res = await axios.get(`${BASE_URL}/task/get`, {
@@ -112,7 +110,7 @@ export default function KanbanBoard() {
   );
 
   if (user.isLoading) {
-    router.replace("login");
+    return <div>loading! Need to login....</div>;
   } else {
     return (
       <div className="flex justify-center mt-14 gap-14 m-14">

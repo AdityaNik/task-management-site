@@ -41,7 +41,7 @@ import { ObjectId } from "bson";
 import { BASE_URL } from "../config";
 import { useRecoilValue } from "recoil";
 import { userState } from "../store/atoms/user";
-import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 enum STATUS {
   TO_DO = "To Do",
@@ -62,7 +62,7 @@ export default function TaskList() {
   const [priority, setPriority] = useState<PRIORITY | null>(null);
   const [duedate, setDueDate] = useState<Date | undefined>(undefined);
   const user = useRecoilValue(userState);
-  const router = useRouter();
+  const { toast } = useToast();
 
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -115,9 +115,16 @@ export default function TaskList() {
       );
       if (res.status === 200) {
         console.log("Task added successfully");
+        toast({
+          title: "Task added",
+        });
         getTasks();
       }
     } catch (e) {
+      toast({
+        variant: "destructive",
+        title: "Error while adding task",
+      });
       console.log(e);
     }
   };
@@ -150,6 +157,9 @@ export default function TaskList() {
           }
         );
         if (res.status === 200) {
+          toast({
+            title: "Task saved",
+          });
           getTasks();
         }
       } catch (e) {
@@ -208,7 +218,7 @@ export default function TaskList() {
   };
 
   if (user.isLoading) {
-    router.replace("login");
+    return <div>loading! Need to login....</div>;
   } else {
     return (
       <div>
@@ -543,6 +553,9 @@ export default function TaskList() {
                               );
                               if (res.status === 200) {
                                 console.log("Successfully deleted task");
+                                toast({
+                                  title: "Task deleted successfully",
+                                });
                                 getTasks();
                               }
                             }}

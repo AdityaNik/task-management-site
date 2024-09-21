@@ -17,6 +17,9 @@ import { useSetRecoilState } from "recoil";
 import { userState } from "../store/atoms/user";
 import { useRouter } from "next/navigation";
 import { BASE_URL } from "../config";
+import InitUser from "@/components/InitUser";
+import { useToast } from "@/hooks/use-toast";
+import { title } from "process";
 
 const Login = () => {
   const [isClient, setIsClient] = useState(false);
@@ -24,6 +27,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const setUser = useSetRecoilState(userState);
   const router = useRouter();
+  const { toast } = useToast();
 
   const login = async () => {
     try {
@@ -38,11 +42,18 @@ const Login = () => {
           isLoading: false,
           username,
         });
+        toast({
+          title: "Login Successfully",
+        });
         router.replace("/");
       }
     } catch (error) {
       // Handle login error (optional)
       console.error("Login failed:", error);
+      toast({
+        variant: "destructive",
+        title: "Invalid username or password",
+      });
     }
   };
 
@@ -56,6 +67,7 @@ const Login = () => {
 
   return (
     <div className="flex mt-32 items-center justify-center">
+      <InitUser></InitUser>
       <Card className="w-[350px]">
         <CardHeader>
           <CardTitle>

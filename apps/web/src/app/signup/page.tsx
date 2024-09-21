@@ -17,6 +17,7 @@ import { useSetRecoilState } from "recoil";
 import { userState } from "../store/atoms/user";
 import { useRouter } from "next/navigation";
 import { BASE_URL } from "../config";
+import { useToast } from "@/hooks/use-toast";
 
 const Signup = () => {
   const [isClient, setIsClient] = useState(false);
@@ -24,6 +25,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const setUser = useSetRecoilState(userState);
   const router = useRouter();
+  const { toast } = useToast();
 
   const register = async () => {
     try {
@@ -38,10 +40,17 @@ const Signup = () => {
           isLoading: false,
           username,
         });
+        toast({
+          title: "User Registered Successfully",
+        });
         router.replace("/");
       }
     } catch (error) {
       // Handle registration error (optional)
+      toast({
+        variant: "destructive",
+        title: "Invalid username or password",
+      });
       console.error("Registration failed:", error);
     }
   };
