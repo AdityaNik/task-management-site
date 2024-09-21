@@ -39,6 +39,9 @@ import axios from "axios";
 import { Task } from "../store/atoms/task";
 import { ObjectId } from "bson";
 import { BASE_URL } from "../config";
+import { useRecoilValue } from "recoil";
+import { userState } from "../store/atoms/user";
+import { useRouter } from "next/navigation";
 
 enum STATUS {
   TO_DO = "To Do",
@@ -46,7 +49,7 @@ enum STATUS {
   COMPLETED = "Completed",
 }
 
-export enum PRIORITY {
+enum PRIORITY {
   Low,
   Medium,
   High,
@@ -58,6 +61,8 @@ export default function TaskList() {
   const [status, setStatus] = useState<STATUS | null>(null);
   const [priority, setPriority] = useState<PRIORITY | null>(null);
   const [duedate, setDueDate] = useState<Date | undefined>(undefined);
+  const user = useRecoilValue(userState);
+  const router = useRouter();
 
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -202,81 +207,231 @@ export default function TaskList() {
     }
   };
 
-  return (
-    <div>
-      <Card className="m-8 lg:m-16">
-        <CardHeader>
-          <CardTitle>
-            <div className="flex justify-between mb-4">
-              <div>
-                <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0">
-                  Task List
-                </h2>
-              </div>
-              <div className="flex gap-8">
-                <Select
-                  onValueChange={(value) => {
-                    applyFilter(value);
-                  }}
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select a filter" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="All">All</SelectItem>
-                      <SelectItem value="Completed">Completed</SelectItem>
-                      <SelectItem value="In-Progress">In Progress</SelectItem>
-                      <SelectItem value="To-Do">To Do</SelectItem>
-                      <SelectItem value="Priority">Priority</SelectItem>
-                      <SelectItem value="Due-Date">Due Date</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button size={"lg"}>Create Task</Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <div className="flex justify-center">
-                        <DialogTitle>Create Task</DialogTitle>
+  if (user.isLoading) {
+    router.replace("login");
+  } else {
+    return (
+      <div>
+        <Card className="m-8 lg:m-16">
+          <CardHeader>
+            <CardTitle>
+              <div className="flex justify-between mb-4">
+                <div>
+                  <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0">
+                    Task List
+                  </h2>
+                </div>
+                <div className="flex gap-8">
+                  <Select
+                    onValueChange={(value) => {
+                      applyFilter(value);
+                    }}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a filter" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="All">All</SelectItem>
+                        <SelectItem value="Completed">Completed</SelectItem>
+                        <SelectItem value="In-Progress">In Progress</SelectItem>
+                        <SelectItem value="To-Do">To Do</SelectItem>
+                        <SelectItem value="Priority">Priority</SelectItem>
+                        <SelectItem value="Due-Date">Due Date</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size={"lg"}>Create Task</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <div className="flex justify-center">
+                          <DialogTitle>Create Task</DialogTitle>
+                        </div>
+                      </DialogHeader>
+                      <div className="grid gap-4 px-2">
+                        {/* Title */}
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                          <Label htmlFor="title">Title</Label>
+                          <Input
+                            id="title"
+                            placeholder="Task Title"
+                            onChange={(e) => {
+                              setTile(e.target.value);
+                            }}
+                          />
+                        </div>
+
+                        {/* Description (Multiline) */}
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                          <Label htmlFor="description">Description</Label>
+                          <Textarea
+                            id="description"
+                            placeholder="Task Description"
+                            onChange={(e) => {
+                              setDiscription(e.target.value);
+                            }}
+                          />
+                        </div>
+
+                        {/* Status */}
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                          <Label htmlFor="status">Status</Label>
+                          <Select
+                            onValueChange={(value) => {
+                              setStatus(value as STATUS);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="To Do">To Do</SelectItem>
+                              <SelectItem value="In Progress">
+                                In Progress
+                              </SelectItem>
+                              <SelectItem value="Completed">
+                                Completed
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Priority */}
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                          <Label htmlFor="priority">Priority</Label>
+                          <Select
+                            onValueChange={(value) => {
+                              setPriority(value as unknown as PRIORITY);
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Priority" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={PRIORITY.High.toString()}>
+                                High
+                              </SelectItem>
+                              <SelectItem value={PRIORITY.Medium.toString()}>
+                                Medium
+                              </SelectItem>
+                              <SelectItem value={PRIORITY.Low.toString()}>
+                                Low
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Due Date (Date Picker) */}
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                          <Label htmlFor="dueDate">Due Date</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="col-span-3">
+                                {duedate
+                                  ? format(duedate, "PPP")
+                                  : "Pick a date"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-auto p-0"
+                              align="start"
+                            >
+                              <Calendar
+                                mode="single"
+                                selected={duedate}
+                                onSelect={setDueDate}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                       </div>
-                    </DialogHeader>
-                    <div className="grid gap-4 px-2">
+                      <DialogClose asChild className="mt-2">
+                        <Button onClick={createTask}>Create</Button>
+                      </DialogClose>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-flow-row grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-8 mx-6">
+              {tasks.map((task) => (
+                <Card
+                  key={task._id as unknown as React.Key}
+                  className={`${
+                    task.status === "Completed"
+                      ? "border-green-500"
+                      : task.status === "In Progress"
+                        ? "border-yellow-500"
+                        : task.status === "To Do"
+                          ? "border-red-500"
+                          : ""
+                  }`}
+                >
+                  <CardContent>
+                    <div className="grid gap-4 py-4">
                       {/* Title */}
-                      <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor="title">Title</Label>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label
+                          htmlFor={`title-${task._id}`}
+                          className="text-right"
+                        >
+                          Title
+                        </Label>
                         <Input
-                          id="title"
-                          placeholder="Task Title"
+                          id={`title-${task._id}`}
+                          value={task.title}
+                          disabled={!task.isEditing}
+                          className="col-span-3"
                           onChange={(e) => {
-                            setTile(e.target.value);
+                            task.title = e.target.value;
+                            setTasks([...tasks]);
                           }}
                         />
                       </div>
 
                       {/* Description (Multiline) */}
-                      <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor="description">Description</Label>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label
+                          htmlFor={`description-${task._id}`}
+                          className="text-right"
+                        >
+                          Description
+                        </Label>
                         <Textarea
-                          id="description"
-                          placeholder="Task Description"
+                          id={`description-${task._id}`}
+                          value={task.description}
+                          disabled={!task.isEditing}
+                          className="col-span-3"
                           onChange={(e) => {
-                            setDiscription(e.target.value);
+                            task.description = e.target.value;
+                            setTasks([...tasks]);
                           }}
                         />
                       </div>
 
                       {/* Status */}
-                      <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor="status">Status</Label>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label
+                          htmlFor={`status-${task._id}`}
+                          className="text-right"
+                        >
+                          Status
+                        </Label>
                         <Select
+                          disabled={!task.isEditing}
+                          value={task.status}
                           onValueChange={(value) => {
-                            setStatus(value as STATUS);
+                            task.status = value as STATUS;
+                            setTasks([...tasks]);
                           }}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="col-span-3">
                             <SelectValue placeholder="Select Status" />
                           </SelectTrigger>
                           <SelectContent>
@@ -290,14 +445,22 @@ export default function TaskList() {
                       </div>
 
                       {/* Priority */}
-                      <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor="priority">Priority</Label>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label
+                          htmlFor={`priority-${task._id}`}
+                          className="text-right"
+                        >
+                          Priority
+                        </Label>
                         <Select
+                          disabled={!task.isEditing}
+                          value={task.priority.toString()}
                           onValueChange={(value) => {
-                            setPriority(value as unknown as PRIORITY);
+                            task.priority = value as unknown as PRIORITY;
+                            setTasks([...tasks]);
                           }}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="col-span-3">
                             <SelectValue placeholder="Select Priority" />
                           </SelectTrigger>
                           <SelectContent>
@@ -315,234 +478,88 @@ export default function TaskList() {
                       </div>
 
                       {/* Due Date (Date Picker) */}
-                      <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor="dueDate">Due Date</Label>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label
+                          htmlFor={`dueDate-${task._id}`}
+                          className="text-right"
+                        >
+                          Due Date
+                        </Label>
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button variant="outline" className="col-span-3">
-                              {duedate ? format(duedate, "PPP") : "Pick a date"}
+                            <Button
+                              variant="outline"
+                              className="col-span-3"
+                              disabled={!task.isEditing}
+                            >
+                              {task.duedate
+                                ? format(task.duedate, "PPP")
+                                : "Pick a date"}
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0" align="start">
                             <Calendar
                               mode="single"
-                              selected={duedate}
-                              onSelect={setDueDate}
+                              selected={task.duedate}
+                              onSelect={(date) => {
+                                task.duedate = date as Date;
+                                setTasks([...tasks]);
+                              }}
                               initialFocus
                             />
                           </PopoverContent>
                         </Popover>
                       </div>
                     </div>
-                    <DialogClose asChild className="mt-2">
-                      <Button onClick={createTask}>Create</Button>
-                    </DialogClose>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-flow-row grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-8 mx-6">
-            {tasks.map((task) => (
-              <Card
-                key={task._id as unknown as React.Key}
-                className={`${
-                  task.status === "Completed"
-                    ? "border-green-500"
-                    : task.status === "In Progress"
-                      ? "border-yellow-500"
-                      : task.status === "To Do"
-                        ? "border-red-500"
-                        : ""
-                }`}
-              >
-                <CardContent>
-                  <div className="grid gap-4 py-4">
-                    {/* Title */}
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label
-                        htmlFor={`title-${task._id}`}
-                        className="text-right"
-                      >
-                        Title
-                      </Label>
-                      <Input
-                        id={`title-${task._id}`}
-                        value={task.title}
-                        disabled={!task.isEditing}
-                        className="col-span-3"
-                        onChange={(e) => {
-                          task.title = e.target.value;
-                          setTasks([...tasks]);
-                        }}
-                      />
-                    </div>
-
-                    {/* Description (Multiline) */}
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label
-                        htmlFor={`description-${task._id}`}
-                        className="text-right"
-                      >
-                        Description
-                      </Label>
-                      <Textarea
-                        id={`description-${task._id}`}
-                        value={task.description}
-                        disabled={!task.isEditing}
-                        className="col-span-3"
-                        onChange={(e) => {
-                          task.description = e.target.value;
-                          setTasks([...tasks]);
-                        }}
-                      />
-                    </div>
-
-                    {/* Status */}
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label
-                        htmlFor={`status-${task._id}`}
-                        className="text-right"
-                      >
-                        Status
-                      </Label>
-                      <Select
-                        disabled={!task.isEditing}
-                        value={task.status}
-                        onValueChange={(value) => {
-                          task.status = value as STATUS;
-                          setTasks([...tasks]);
-                        }}
-                      >
-                        <SelectTrigger className="col-span-3">
-                          <SelectValue placeholder="Select Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="To Do">To Do</SelectItem>
-                          <SelectItem value="In Progress">
-                            In Progress
-                          </SelectItem>
-                          <SelectItem value="Completed">Completed</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Priority */}
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label
-                        htmlFor={`priority-${task._id}`}
-                        className="text-right"
-                      >
-                        Priority
-                      </Label>
-                      <Select
-                        disabled={!task.isEditing}
-                        value={task.priority.toString()}
-                        onValueChange={(value) => {
-                          task.priority = value as unknown as PRIORITY;
-                          setTasks([...tasks]);
-                        }}
-                      >
-                        <SelectTrigger className="col-span-3">
-                          <SelectValue placeholder="Select Priority" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={PRIORITY.High.toString()}>
-                            High
-                          </SelectItem>
-                          <SelectItem value={PRIORITY.Medium.toString()}>
-                            Medium
-                          </SelectItem>
-                          <SelectItem value={PRIORITY.Low.toString()}>
-                            Low
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Due Date (Date Picker) */}
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label
-                        htmlFor={`dueDate-${task._id}`}
-                        className="text-right"
-                      >
-                        Due Date
-                      </Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
+                  </CardContent>
+                  <CardFooter className="flex justify-between">
+                    {task.isEditing ? (
+                      <Button onClick={() => handleSave(task._id)}>Save</Button>
+                    ) : (
+                      <Button onClick={() => handleEdit(task._id)}>Edit</Button>
+                    )}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button>Delete</Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <div>
+                            <DialogTitle>Delete Task</DialogTitle>
+                          </div>
+                        </DialogHeader>
+                        Do you really want to delete the task?
+                        <DialogClose asChild>
                           <Button
-                            variant="outline"
-                            className="col-span-3"
-                            disabled={!task.isEditing}
-                          >
-                            {task.duedate
-                              ? format(task.duedate, "PPP")
-                              : "Pick a date"}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={task.duedate}
-                            onSelect={(date) => {
-                              task.duedate = date as Date;
-                              setTasks([...tasks]);
-                            }}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  {task.isEditing ? (
-                    <Button onClick={() => handleSave(task._id)}>Save</Button>
-                  ) : (
-                    <Button onClick={() => handleEdit(task._id)}>Edit</Button>
-                  )}
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button>Delete</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <div>
-                          <DialogTitle>Delete Task</DialogTitle>
-                        </div>
-                      </DialogHeader>
-                      Do you really want to delete the task?
-                      <DialogClose asChild>
-                        <Button
-                          onClick={async (e) => {
-                            const res = await axios.delete(
-                              `${BASE_URL}/task/delete/${task._id}`,
-                              {
-                                headers: {
-                                  Authorization: localStorage.getItem("token"),
-                                },
+                            onClick={async (e) => {
+                              const res = await axios.delete(
+                                `${BASE_URL}/task/delete/${task._id}`,
+                                {
+                                  headers: {
+                                    Authorization:
+                                      localStorage.getItem("token"),
+                                  },
+                                }
+                              );
+                              if (res.status === 200) {
+                                console.log("Successfully deleted task");
+                                getTasks();
                               }
-                            );
-                            if (res.status === 200) {
-                              console.log("Successfully deleted task");
-                              getTasks();
-                            }
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </DialogClose>
-                    </DialogContent>
-                  </Dialog>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-        <CardFooter className="flex justify-between"></CardFooter>
-      </Card>
-    </div>
-  );
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </DialogClose>
+                      </DialogContent>
+                    </Dialog>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between"></CardFooter>
+        </Card>
+      </div>
+    );
+  }
 }

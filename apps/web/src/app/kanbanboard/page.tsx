@@ -6,10 +6,15 @@ import { Separator } from "@/components/ui/separator";
 import axios from "axios";
 import { Task } from "../store/atoms/task";
 import { BASE_URL } from "../config";
+import { useRecoilValue } from "recoil";
+import { userState } from "../store/atoms/user";
+import { useRouter } from "next/navigation";
 
 export default function KanbanBoard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hydrated, setHydrated] = useState<boolean>(false);
+  const user = useRecoilValue(userState);
+  const router = useRouter();
 
   const getTasks = async () => {
     const res = await axios.get(`${BASE_URL}/task/get`, {
@@ -106,31 +111,35 @@ export default function KanbanBoard() {
     </li>
   );
 
-  return (
-    <div className="flex justify-center mt-14 gap-14 m-14">
-      {["To Do", "In Progress", "Completed"].map((status) => (
-        <Card
-          key={status}
-          className={`${
-            status === "Completed"
-              ? "border-green-500 w-1/3"
-              : status === "In Progress"
-                ? "border-yellow-500 w-1/3"
-                : status === "To Do"
-                  ? "border-red-500 w-1/3"
-                  : "w-1/3"
-          }`}
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, status as Task["status"])}
-        >
-          <CardContent>
-            <h3 className="text-xl font-semibold mb-4 mt-4">{status}</h3>
-            <ul className="space-y-2">
-              {tasks.filter((task) => task.status === status).map(renderTask)}
-            </ul>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
+  if (user.isLoading) {
+    router.replace("login");
+  } else {
+    return (
+      <div className="flex justify-center mt-14 gap-14 m-14">
+        {["To Do", "In Progress", "Completed"].map((status) => (
+          <Card
+            key={status}
+            className={`${
+              status === "Completed"
+                ? "border-green-500 w-1/3"
+                : status === "In Progress"
+                  ? "border-yellow-500 w-1/3"
+                  : status === "To Do"
+                    ? "border-red-500 w-1/3"
+                    : "w-1/3"
+            }`}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, status as Task["status"])}
+          >
+            <CardContent>
+              <h3 className="text-xl font-semibold mb-4 mt-4">{status}</h3>
+              <ul className="space-y-2">
+                {tasks.filter((task) => task.status === status).map(renderTask)}
+              </ul>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 }
