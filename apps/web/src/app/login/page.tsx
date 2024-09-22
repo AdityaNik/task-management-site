@@ -19,17 +19,18 @@ import { useRouter } from "next/navigation";
 import { BASE_URL } from "../config";
 import InitUser from "@/components/InitUser";
 import { useToast } from "@/hooks/use-toast";
-import { title } from "process";
 
 const Login = () => {
   const [isClient, setIsClient] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showSleepMessage, setShowSleepMessage] = useState(false);
   const setUser = useSetRecoilState(userState);
   const router = useRouter();
   const { toast } = useToast();
 
   const login = async () => {
+    setShowSleepMessage(true);
     try {
       const res = await axios.post(`${BASE_URL}/auth/login`, {
         username,
@@ -48,12 +49,13 @@ const Login = () => {
         router.replace("/");
       }
     } catch (error) {
-      // Handle login error (optional)
       console.error("Login failed:", error);
       toast({
         variant: "destructive",
         title: "Invalid username or password",
       });
+    } finally {
+      setShowSleepMessage(false);
     }
   };
 
@@ -67,8 +69,13 @@ const Login = () => {
 
   return (
     <div className="flex mt-10 m-4 lg:mt-32 items-center justify-center">
-      <InitUser></InitUser>
+      <InitUser />
       <Card className="w-[350px]">
+        {showSleepMessage && (
+          <div className="bg-yellow-100 text-yellow-800 p-2 mb-4 rounded-md text-center">
+            Server is sleeping, please wait for a minute...
+          </div>
+        )}
         <CardHeader>
           <CardTitle>
             <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0">

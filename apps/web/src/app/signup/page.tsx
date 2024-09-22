@@ -24,10 +24,12 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const setUser = useSetRecoilState(userState);
+  const [showSleepMessage, setShowSleepMessage] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
   const register = async () => {
+    setShowSleepMessage(true);
     try {
       const res = await axios.post(`${BASE_URL}/auth/sign-up`, {
         username,
@@ -66,6 +68,11 @@ const Signup = () => {
   return (
     <div className="flex mt-10 m-4 lg:mt-32 items-center justify-center">
       <Card className="w-[350px]">
+        {showSleepMessage && (
+          <div className="bg-yellow-100 text-yellow-800 p-2 mb-4 rounded-md text-center">
+            Server is sleeping, please wait for a minute...
+          </div>
+        )}
         <CardHeader>
           <CardTitle>
             <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0">

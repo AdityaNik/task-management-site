@@ -13,20 +13,12 @@ if (process.env.CONNECTION_STRING && process.env.DB_NAME) {
   console.log("ERROR connecting no data available");
 }
 
-app.use(cors({
-  methods: ["POST", "GET", "DELETE"],
-}));
+app.use(cors());
 app.use(express.json())
 
 // Define routes for authentication and task management
 app.use('/auth', authRouter);
 app.use('/task', taskRouter);
-
-app.get('/', (req, res) => {
-  res.json({
-    "msg": "hello all"
-  })
-})
 
 // Start the server and listen on the specified port
 app.listen(process.env.PORT, () => {
