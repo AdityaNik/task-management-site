@@ -13,7 +13,9 @@ if (process.env.CONNECTION_STRING && process.env.DB_NAME) {
   console.log("ERROR connecting no data available");
 }
 
-app.use(cors());
+app.use(cors({
+  methods: ["POST", "GET", "DELETE"],
+}));
 app.use(express.json())
 
 // Define routes for authentication and task management
