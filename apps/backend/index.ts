@@ -20,6 +20,12 @@ app.use(express.json())
 app.use('/auth', authRouter);
 app.use('/task', taskRouter);
 
+app.get('/', (req, res) => {
+  res.json({
+    "msg": "hello all"
+  })
+})
+
 // Start the server and listen on the specified port
 app.listen(process.env.PORT, () => {
   console.log('Backend is on...');
