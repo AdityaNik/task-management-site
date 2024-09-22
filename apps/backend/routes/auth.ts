@@ -18,7 +18,7 @@ router.get('/me', USERAUTHENTICATION, async (req, res) => {
 });
 
 // Route for user login
-router.post('/login', async (req, res) => {
+router.get('/login', async (req, res) => {
   const data: UserInput = req.body;
   const username = data.username;
   const password = data.password;
